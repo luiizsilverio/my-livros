@@ -1,31 +1,39 @@
 import express from "express";
+import db from "./database/index.js";
+import Livro from "./models/Livro.js";
+import routes from "./routes/index.js";
+
+db.on("error", console.log.bind(console, 'Erro de conexão'));
+
+db.once("open", () => {
+  console.log('BD conectado com sucesso');
+})
 
 const app = express();
 
 app.use(express.json());
 
-const livros = [
-  {
-    id: 1,
-    title: "Entrevista com o Vampiro"
-  },
-  {
-    id: 2,
-    title: "1984"
-  }
-]
+routes(app);
 
-app.get('/', (req, res) => {
-  res.status(200).send("API de livros")
-})
+// const livros = [
+//   {
+//     id: 1,
+//     title: "Entrevista com o Vampiro"
+//   },
+//   {
+//     id: 2,
+//     title: "1984"
+//   }
+// ]
 
-app.get('/livros', (req, res) => {
-  res.status(200).json(livros);
-})
 
-app.get('/livros/:id', (req, res) => {
+// app.get('/', (req, res) => {
+//   res.status(200).send("API de livros")
+// })
+
+app.get('/livros/:id', async (req, res) => {
   const { id } = req.params;
-  const livro = livros.find(livro => livro.id == id);
+  const livro = await Livro.findOne({ _id: id });
 
   if (livro) {
     res.json(livro);
