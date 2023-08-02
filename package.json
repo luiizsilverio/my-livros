@@ -9,7 +9,7 @@
     "dev": "nodemon server"
   },
   "keywords": [],
-  "author": "",
+  "author": "Luiz Oliveira <luiiz.silverio@gmail.com>",
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.3.1",
