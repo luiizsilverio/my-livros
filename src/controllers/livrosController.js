@@ -10,7 +10,7 @@ class LivroController {
     res.status(200).json(livros);
   }
 
-  static showLivro = async (req, res) => {
+  static showLivro = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -23,39 +23,38 @@ class LivroController {
         res.status(400).send('Livro não encontrado');
       }
     }
-    catch (err) {
-      res.status(400).send({
-        message: "Erro ao localizar o livro",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static listarLivrosPorEditora = async (req, res) => {
-    const { editora } = req.query;
+  static listarLivrosPorEditora = async (req, res, next) => {
+    try {
+      const { editora } = req.query;
 
-    const livros = await Livro.find({ editora })
-      .populate('autor')
-      .sort('title');
+      const livros = await Livro.find({ editora })
+        .populate('autor')
+        .sort('title');
 
-    res.status(200).json(livros);
+      res.status(200).json(livros);
+    }
+    catch (erro) {
+      next(erro);
+    }
   }
 
-  static cadastrarLivro = async (req, res) => {
+  static cadastrarLivro = async (req, res, next) => {
     const newBook = new Livro(req.body);
     try {
       const livro = await newBook.save();
       res.status(201).json(livro);
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao criar o livro",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static atualizarLivro = async (req, res) => {
+  static atualizarLivro = async (req, res, next) => {
     const { id } = req.params;
 
     const newBook = { ...req.body };
@@ -71,26 +70,20 @@ class LivroController {
       const livro = await Livro.findByIdAndUpdate( id, { $set: newBook });
       res.json(livro);
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao atualizar o livro",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static excluirLivro = async (req, res) => {
+  static excluirLivro = async (req, res, next) => {
     const { id } = req.params;
 
     try {
       await Livro.findByIdAndDelete(id);
       res.send("Livro removido com sucesso");
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao remover o livro",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 

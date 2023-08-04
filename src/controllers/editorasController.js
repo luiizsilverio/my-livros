@@ -7,7 +7,7 @@ class EditoraController {
     res.status(200).json(editoras);
   }
 
-  static showEditora = async (req, res) => {
+  static showEditora = async (req, res, next) => {
     const { id } = req.params;
 
     try {
@@ -20,29 +20,23 @@ class EditoraController {
         res.status(400).send('Editora não encontrada');
       }
     }
-    catch (err) {
-      res.status(400).send({
-        message: "Erro ao localizar a editora",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static cadastrarEditora = async (req, res) => {
+  static cadastrarEditora = async (req, res, next) => {
     const newEditora = new Editora(req.body);
     try {
       const editora = await newEditora.save();
       res.status(201).json(editora);
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao criar a editora",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static atualizarEditora = async (req, res) => {
+  static atualizarEditora = async (req, res, next) => {
     const { id } = req.params;
 
     const newEditora = { ...req.body };
@@ -53,26 +47,20 @@ class EditoraController {
       const editora = await Editora.findByIdAndUpdate( id, { $set: newEditora });
       res.json(editora);
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao atualizar a editora",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
-  static excluirEditora = async (req, res) => {
+  static excluirEditora = async (req, res, next) => {
     const { id } = req.params;
 
     try {
       await Editora.findByIdAndDelete(id);
       res.send("Editora removida com sucesso");
     }
-    catch (err) {
-      res.status(500).send({
-        message: "Erro ao remover a editora",
-        error: err.message
-      });
+    catch (erro) {
+      next(erro);
     }
   }
 
