@@ -5,7 +5,7 @@ const editoraSchema = new mongoose.Schema({
   // id: String,
   nome: {
     type: String,
-    required: true
+    required: [true, "O nome é obrigatório"]
   }
 },
 {

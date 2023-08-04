@@ -2,12 +2,17 @@ import Livro from "../models/Livro.js";
 
 class LivroController {
 
-  static listarLivros = async (req, res) => {
-    const livros = await Livro.find()
-      .populate('autor')
-      .sort('title');
+  static listarLivros = async (req, res, next) => {
+    try {
+      const livros = await Livro.find()
+        .populate('autor')
+        .sort('title');
 
-    res.status(200).json(livros);
+      res.status(200).json(livros);
+    }
+    catch (erro) {
+      next(erro);
+    }
   }
 
   static showLivro = async (req, res, next) => {
