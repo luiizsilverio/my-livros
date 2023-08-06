@@ -1,4 +1,5 @@
 import Livro from "../models/Livro.js";
+import NotFound from "../erros/NotFound.js";
 
 class LivroController {
 
@@ -25,7 +26,7 @@ class LivroController {
         res.json(livro);
       }
       else {
-        res.status(400).send('Livro não encontrado');
+        next(new NotFound("Id do autor não encontrado."));
       }
     }
     catch (erro) {

@@ -1,4 +1,5 @@
 import Editora from "../models/Editora.js";
+import NotFound from "../erros/NotFound.js";
 
 class EditoraController {
 
@@ -17,7 +18,7 @@ class EditoraController {
         res.json(editora);
       }
       else {
-        res.status(400).send('Editora não encontrada');
+        next(new NotFound("Id da editora não encontrado."));
       }
     }
     catch (erro) {
