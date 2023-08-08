@@ -1,4 +1,4 @@
-import Editora from "../models/Editora.js";
+import { Editora } from "../models/index.js";
 import NotFound from "../erros/NotFound.js";
 
 class EditoraController {
@@ -46,7 +46,13 @@ class EditoraController {
 
     try {
       const editora = await Editora.findByIdAndUpdate( id, { $set: newEditora });
-      res.json(editora);
+
+      if (editora) {
+        res.json(editora);
+      }
+      else {
+        next(new NotFound("Id da editora não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);
@@ -57,8 +63,17 @@ class EditoraController {
     const { id } = req.params;
 
     try {
-      await Editora.findByIdAndDelete(id);
-      res.send("Editora removida com sucesso");
+      const editora = await Editora.findByIdAndDelete(id);
+
+      if (editora) {
+        res.json({
+          message: "Editora removida com sucesso",
+          status: 200
+        })
+      }
+      else {
+        next(new NotFound("Id da editora não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);

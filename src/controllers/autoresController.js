@@ -1,4 +1,4 @@
-import Autor from "../models/Autor.js";
+import { Autor } from "../models/index.js";
 import NotFound from "../erros/NotFound.js";
 
 class AutorController {
@@ -46,7 +46,13 @@ class AutorController {
 
     try {
       const autor = await Autor.findByIdAndUpdate( id, { $set: newAutor });
-      res.json(autor);
+
+      if (autor) {
+        res.json(autor);
+      }
+      else {
+        next(new NotFound("Id do autor não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);
@@ -57,8 +63,17 @@ class AutorController {
     const { id } = req.params;
 
     try {
-      await Autor.findByIdAndDelete(id);
-      res.send("Autor removido com sucesso");
+      const autor = await Autor.findByIdAndDelete(id);
+
+      if (autor) {
+        res.json({
+          message: "Autor removido com sucesso",
+          status: 200
+        })
+      }
+      else {
+        next(new NotFound("Id do autor não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);

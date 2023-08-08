@@ -1,5 +1,21 @@
-import Livro from "../models/Livro.js";
+import { Livro } from "../models/index.js";
 import NotFound from "../erros/NotFound.js";
+
+function getFiltro(query) {
+  const { editora, title, minPaginas, maxPaginas } = query;
+
+  // 2 maneiras de fazer regex, uma pelo JS e outro pelo Mongoose
+  // const regex = new RegExp(title, 'i');
+  const regex = { $regex: title, $options: "i" }; // i = Case Insensitive
+
+  const filtro = {};
+  if (editora) filtro.editora = editora;
+  if (title) filtro.title = regex;
+  if (minPaginas || maxPaginas) filtro.paginas = {};
+  if (minPaginas) filtro.paginas.$gte = minPaginas;
+  if (maxPaginas) filtro.paginas.$lte = maxPaginas;
+  return filtro;
+}
 
 class LivroController {
 
@@ -34,11 +50,11 @@ class LivroController {
     }
   }
 
-  static listarLivrosPorEditora = async (req, res, next) => {
+  static listarLivrosPorFiltro = async (req, res, next) => {
     try {
-      const { editora } = req.query;
+      const filtro = getFiltro(req.query);
 
-      const livros = await Livro.find({ editora })
+      const livros = await Livro.find(filtro)
         .populate('autor')
         .sort('title');
 
@@ -74,7 +90,13 @@ class LivroController {
       //   { new: true }); // atualiza somente os campos passados no body
 
       const livro = await Livro.findByIdAndUpdate( id, { $set: newBook });
-      res.json(livro);
+
+      if (livro) {
+        res.json(livro);
+      }
+      else {
+        next(new NotFound("Id do livro não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);
@@ -85,8 +107,17 @@ class LivroController {
     const { id } = req.params;
 
     try {
-      await Livro.findByIdAndDelete(id);
-      res.send("Livro removido com sucesso");
+      const livro = await Livro.findByIdAndDelete(id);
+
+      if (livro) {
+        res.json({
+          message: "Livro removido com sucesso",
+          status: 200
+        })
+      }
+      else {
+        next(new NotFound("Id do livro não encontrado."));
+      }
     }
     catch (erro) {
       next(erro);
