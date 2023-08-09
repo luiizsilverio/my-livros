@@ -11,7 +11,7 @@
 API desenvolvida em __Node.js__ que implementa um CRUD com banco de dados __MongoDB__.<br />
 Possui 3 coleções: Livros, Autores e Editoras.
 O banco de dados pode ser local ou na nuvem, com MongoDB Atlas. Para definir o banco na nuvem, informe as configurações do banco no arquivo __.env__.<br />
-Desenvolvido durante o curso [Node.js: API Rest com Express e MongoDB](https://cursos.alura.com.br/course/nodejs-api-rest-express-mongodb), da Alura.
+Desenvolvido durante o curso [Node.js: API Rest com Express e MongoDB](https://cursos.alura.com.br/course/nodejs-api-rest-express-mongodb) e depois aperfeiçoado com filtros, paginação e tratamento de erros, no curso [Node.Js: Lidando com Buscas, Filtros, Paginação e Erros em uma API](https://cursos.alura.com.br/course/node-js-buscas-filtros-paginacao-erros-api), da Alura.
 <br />
 
 ### Rotas da aplicação

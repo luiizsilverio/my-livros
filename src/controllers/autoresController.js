@@ -3,9 +3,17 @@ import NotFound from "../erros/NotFound.js";
 
 class AutorController {
 
-  static listarAutores = async (req, res) => {
-    const autores = await Autor.find().sort('nome');
-    res.status(200).json(autores);
+  static listarAutores = async (req, res, next) => {
+    try {
+      const resultado = Autor.find().sort('nome');
+
+      req.resultado = resultado;
+
+      next();
+
+    } catch (erro) {
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
   }
 
   static showAutor = async (req, res, next) => {

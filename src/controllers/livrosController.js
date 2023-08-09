@@ -1,19 +1,31 @@
-import { Livro } from "../models/index.js";
+import { Autor, Livro } from "../models/index.js";
 import NotFound from "../erros/NotFound.js";
 
-function getFiltro(query) {
-  const { editora, title, minPaginas, maxPaginas } = query;
+async function getFiltro(query) {
+  const { editora, title, minPaginas, maxPaginas, nomeAutor } = query;
 
   // 2 maneiras de fazer regex, uma pelo JS e outro pelo Mongoose
-  // const regex = new RegExp(title, 'i');
+  // - pelo JS: const regex = new RegExp(title, 'i');
+  // - pelo Mongoose: const regex = { $regex: title, $options: "i" };
   const regex = { $regex: title, $options: "i" }; // i = Case Insensitive
+  let filtro = {};
 
-  const filtro = {};
   if (editora) filtro.editora = editora;
   if (title) filtro.title = regex;
+
   if (minPaginas || maxPaginas) filtro.paginas = {};
   if (minPaginas) filtro.paginas.$gte = minPaginas;
   if (maxPaginas) filtro.paginas.$lte = maxPaginas;
+
+  if (nomeAutor) {
+    const autor = await Autor.findOne({ nome: nomeAutor });
+    if (autor) {
+      filtro.autor = autor._id;
+    } else {
+      filtro = null; // não achou
+    }
+  }
+
   return filtro;
 }
 
@@ -21,11 +33,11 @@ class LivroController {
 
   static listarLivros = async (req, res, next) => {
     try {
-      const livros = await Livro.find()
-        .populate('autor')
-        .sort('title');
+      const resultado = Livro.find().populate('autor');
 
-      res.status(200).json(livros);
+      req.resultado = resultado;
+
+      next();
     }
     catch (erro) {
       next(erro);
@@ -52,13 +64,18 @@ class LivroController {
 
   static listarLivrosPorFiltro = async (req, res, next) => {
     try {
-      const filtro = getFiltro(req.query);
+      const filtro = await getFiltro(req.query);
 
-      const livros = await Livro.find(filtro)
-        .populate('autor')
-        .sort('title');
+      if (filtro) {
+        const resultado = Livro.find(filtro).populate('autor');
 
-      res.status(200).json(livros);
+        req.resultado = resultado;
+
+        next();
+
+      } else {
+        res.status(200).send([]);
+      }
     }
     catch (erro) {
       next(erro);

@@ -2,7 +2,6 @@ import mongoose from "mongoose"
 import ErroBase from "../erros/ErroBase.js";
 import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 import ErroValidacao from "../erros/ErroValidacao.js";
-import NotFound from "../erros/NotFound.js";
 
 function trataErros(erro, req, res, next) {
   // console.log('ERRO ***', JSON.stringify(erro.errors, null, 2));
@@ -15,7 +14,7 @@ function trataErros(erro, req, res, next) {
     return new ErroValidacao(erro).enviarResposta(res);
   }
 
-  if (erro instanceof NotFound) {
+  if (erro instanceof ErroBase) {
     return erro.enviarResposta(res);
   }
 
